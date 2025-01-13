@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "683652461527",
+    "firebase_url": "https://gasmeasuring-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "gasmeasuring",
+    "storage_bucket": "gasmeasuring.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683652461527:android:8a46c76b449f1419ff9192",
+        "android_client_info": {
+          "package_name": "com.example.gas_measuring_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvK1bGL0IJWPTcJHO0allknzDdgW16IrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
