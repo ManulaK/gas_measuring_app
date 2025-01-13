@@ -1,5 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:gas_measuring_app/home_screen.dart';
+import 'package:gas_measuring_app/result_page.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class RpmIndicatorScreen extends StatefulWidget {
@@ -12,7 +14,7 @@ class RpmIndicatorScreen extends StatefulWidget {
 }
 
 class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
-  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref("sensorData");
+  final DatabaseReference _dbRef = FirebaseDatabase.instance.ref();
   Map<String, String> _sensorData = {
     "co": "0",
     "co2": "0",
@@ -23,21 +25,75 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
   @override
   void initState() {
     super.initState();
+    _fetchMeasuringConstants();
     _fetchSensorData();
   }
 
+  // Fetch the measuring constants from Firebase
+  void _fetchMeasuringConstants() {
+    _dbRef.child("measuringConstants").get().then((DataSnapshot snapshot) {
+      final data = snapshot.value as Map?;
+      if (data != null) {
+        setState(() {});
+      }
+    });
+  }
+
+  // Fetch sensor data and check the threshold
   void _fetchSensorData() {
     _dbRef.onValue.listen((DatabaseEvent event) {
       final data = event.snapshot.value as Map?;
       if (data != null) {
-        setState(() {
-          _sensorData = {
-            "co": data["co"]?.toString() ?? "0",
-            "co2": data["co2"]?.toString() ?? "0",
-            "hc": data["hc"]?.toString() ?? "0",
-            "rpm": data["rpm"]?.toString() ?? "0",
-          };
-        });
+        final measuringConstants = data["measuringConstants"] as Map?;
+        final sensorData = data["sensorData"] as Map?;
+
+        if (measuringConstants != null && sensorData != null) {
+          setState(() {
+            _sensorData = {
+              "co": sensorData["co"]?.toString() ?? "0",
+              "co2": sensorData["co2"]?.toString() ?? "0",
+              "hc": sensorData["hc"]?.toString() ?? "0",
+              "rpm": sensorData["rpm"]?.toString() ?? "0",
+            };
+          });
+
+          // Parse measuring constants
+          double rpmThreshold =
+              double.tryParse(measuringConstants["rpm"].toString()) ?? 2500;
+          double coThreshold =
+              double.tryParse(measuringConstants["co"].toString()) ?? 4.5;
+          double co2Threshold =
+              double.tryParse(measuringConstants["co2"].toString()) ?? 4.5;
+          double hcThreshold =
+              double.tryParse(measuringConstants["hc"].toString()) ?? 1200;
+
+          // Parse sensor data
+          double currentRpm = double.tryParse(_sensorData['rpm'] ?? "0") ?? 0;
+          double co = double.tryParse(_sensorData['co'] ?? "0") ?? 0;
+          double co2 = double.tryParse(_sensorData['co2'] ?? "0") ?? 0;
+          double hc = double.tryParse(_sensorData['hc'] ?? "0") ?? 0;
+
+          // Check if the test is pass or fail
+          bool isTestPass =
+              co < coThreshold && co2 < co2Threshold && hc < hcThreshold;
+
+          // Navigate to the ResultPage if RPM threshold is exceeded
+          if (currentRpm >= rpmThreshold) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResultPage(
+                  vehicleNumber: widget.vehicleNumber,
+                  rpm: currentRpm,
+                  co: co,
+                  co2: co2,
+                  hc: hc,
+                  isTestPass: isTestPass,
+                ),
+              ),
+            );
+          }
+        }
       }
     });
   }
@@ -47,12 +103,11 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            // Navigate back to the previous page
-            Navigator.pop(context);
-          },
-        ),
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                )),
       ),
       body: Padding(
         padding: const EdgeInsets.all(38.0),
@@ -133,7 +188,9 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
                 ],
               ),
             ),
-          ],
+          
+		  
+		  ],
         ),
       ),
     );
@@ -141,13 +198,12 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
 
   Widget _buildDetailedCard(
       String title, String value, String details, Color color, IconData icon) {
-    // Format the value to 3 decimal places
-    String formattedValue = double.tryParse(value)?.toStringAsFixed(3) ?? value;
+    String formattedValue = double.tryParse(value)?.toStringAsFixed(2) ?? value;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
+        color: color.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color, width: 1.5),
       ),
@@ -173,7 +229,7 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
                 ],
               ),
               Text(
-                formattedValue, // Use the formatted value here
+                formattedValue,
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -194,4 +250,6 @@ class _RpmIndicatorPageState extends State<RpmIndicatorScreen> {
       ),
     );
   }
+
+
 }

@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           setState(() {
                             _vehicleError = null;
                           });
-                           Navigator.push(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => RpmIndicatorScreen(
