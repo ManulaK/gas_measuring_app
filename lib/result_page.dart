@@ -52,13 +52,13 @@ class ResultPage extends StatelessWidget {
                 width: 200, height: 200, repeat: false),
             Text(
               isTestPass
-                  ? "Great news! Your vehicle has passed the gas emission test. This means the emissions from your vehicle meet the required environmental standards, ensuring it is eco-friendly and safe for the environment. Keep up with regular maintenance to maintain these levels."
-                  : "Unfortunately, your vehicle did not pass the gas emission test. This indicates that one or more emission levels (e.g., CO, CO2, HC) exceeded the acceptable limits. Please have your vehicle inspected and serviced to address potential issues with the engine, exhaust system, or fuel efficiency. Regular checks can help improve performance and ensure compliance with environmental standards.",
-              textAlign: TextAlign.center,
+                  ? "Great news! Vehicle ${vehicleNumber ?? 'N/A'} passed the gas emission test. It meets environmental standards, ensuring eco-friendliness. Regular maintenance helps keep it that way."
+                  : "Unfortunately, Vehicle ${vehicleNumber ?? 'N/A'} failed the gas emission test. Emission levels exceeded limits. Please service the vehicle to address potential issues and ensure compliance.",
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 16,
                 color: Colors.grey[700],
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
             Expanded(
