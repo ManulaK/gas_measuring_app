@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gas_measuring_app/rpm_indicator_screen.dart';
 import 'package:lottie/lottie.dart';
 
@@ -79,6 +80,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     prefixIcon: Icon(Icons.directions_car),
                   ),
                   keyboardType: TextInputType.text,
+                  inputFormatters: [
+                    UpperCaseTextFormatter(),
+                  ],
                 ),
 
                 const SizedBox(height: 20),
@@ -142,6 +146,17 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
     );
   }
 }
